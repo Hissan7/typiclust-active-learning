@@ -6,3 +6,10 @@ venv/
 
 #commands
 commands.txt
+experiments/terminal_work.py
+
+#misc 
+src/__pycache__/
+__pycache__/
+__pycache__
+data/
