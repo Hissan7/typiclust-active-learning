@@ -1,8 +1,8 @@
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 
-def get_the_cifar10_train_loader(batch_size: int = 256):
+def get_the_cifar10_train_loader(batch_size: int = 256, subset_size: int | None = None):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -14,6 +14,9 @@ def get_the_cifar10_train_loader(batch_size: int = 256):
         download=True,
         transform=transform
     )
+
+    if subset_size is not None:
+        dataset = Subset(dataset, list(range(subset_size)))
 
     loader = DataLoader(
         dataset,
