@@ -2,7 +2,7 @@ import torch
 import torchvision.models as models
 
 
-print("hello")
+print("Initiating feature extractor...")
 class FeatureExtractor:
     def __init__(self, device: str = None):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")

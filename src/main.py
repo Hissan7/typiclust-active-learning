@@ -1,15 +1,14 @@
-from data_loader import get_cifar10_train_loader
+from data_loader import get_the_cifar10_train_loader
 from feature_extractor import FeatureExtractor
 from clustering import cluster_features
 from selector import select_most_typical_per_cluster
-
+import numpy as np
 
 def main():
     budget = 10
 
     print("1. Loading CIFAR-10...")
-    dataset, loader = get_cifar10_train_loader()
-
+    dataset, loader = get_the_cifar10_train_loader(subset_size=5000)
     print("2. Extracting features...")
     extractor = FeatureExtractor()
     features = extractor.extract_features(loader).numpy()
@@ -28,6 +27,12 @@ def main():
     print(f"8. Number of selected samples: {len(selected_indices)}")
     print("9. Selected indices:", selected_indices)
 
+    print("10. Selected labels:")
+    selected_labels = [dataset[i][1] for i in selected_indices]
+    print(selected_labels)
+
+    np.save("results/selected_indices.npy", np.array(selected_indices)) #indices
+    np.save("results/selected_labels.npy", np.array(selected_labels)) #labels
 
 if __name__ == "__main__":
     main()
