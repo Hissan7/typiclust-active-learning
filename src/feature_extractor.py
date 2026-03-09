@@ -2,10 +2,17 @@ import torch
 import torchvision.models as models
 
 
-print("Initiating feature extractor...")
 class FeatureExtractor:
     def __init__(self, device: str = None):
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        if device is not None:
+            self.device = device
+        elif torch.backends.mps.is_available():
+            self.device = "mps"
+        elif torch.cuda.is_available():
+            self.device = "cuda"
+        else:
+            self.device = "cpu"
+
         print("Using device:", self.device)
 
         weights = models.ResNet18_Weights.DEFAULT
