@@ -13,8 +13,8 @@ from simclr.extract_embeddings import extract_embeddings
 
 SUBSET_SIZE = 50000
 BUDGET = 200
-EPOCHS = 10
-SIMCLR_EPOCHS = 20
+EPOCHS = 30
+SIMCLR_EPOCHS = 30
 
 MODEL_PATH = "models/simclr_resnet18.pth"
 
