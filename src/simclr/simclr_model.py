@@ -9,7 +9,6 @@ class SimCLR(nn.Module):
 
         backbone = models.resnet18(weights=None)
 
-        # remove final fc layer
         self.encoder = nn.Sequential(*list(backbone.children())[:-1])
         feature_dim = backbone.fc.in_features  # 512 for ResNet18
 
@@ -20,7 +19,7 @@ class SimCLR(nn.Module):
         )
 
     def forward(self, x):
-        h = self.encoder(x)              # [B, 512, 1, 1]
-        h = torch.flatten(h, start_dim=1)  # [B, 512]
-        z = self.projector(h)            # [B, 128]
+        h = self.encoder(x)              
+        h = torch.flatten(h, start_dim=1) 
+        z = self.projector(h)            
         return h, z

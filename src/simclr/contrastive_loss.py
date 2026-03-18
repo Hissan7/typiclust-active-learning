@@ -8,9 +8,9 @@ def nt_xent_loss(z1, z2, temperature: float = 0.5):
     z1 = F.normalize(z1, dim=1)
     z2 = F.normalize(z2, dim=1)
 
-    z = torch.cat([z1, z2], dim=0)  # [2B, D]
+    z = torch.cat([z1, z2], dim=0)  
 
-    similarity = torch.matmul(z, z.T)  # [2B, 2B]
+    similarity = torch.matmul(z, z.T)  
     similarity = similarity / temperature
 
     mask = torch.eye(2 * batch_size, device=z.device).bool()
