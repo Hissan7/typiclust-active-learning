@@ -137,7 +137,6 @@ def select_weighted_typical_samples(
 
         selected_indices.extend(chosen_global.tolist())
 
-    # Safety trim in case of overflow
     selected_indices = selected_indices[:budget]
 
     return selected_indices
