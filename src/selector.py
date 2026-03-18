@@ -141,3 +141,43 @@ def select_weighted_typical_samples(
     selected_indices = selected_indices[:budget]
 
     return selected_indices
+
+from typicality import compute_typicality_of_points, compute_centrality
+
+
+def select_centrality_typical_samples(features, cluster_labels, budget, alpha=0.7):
+    """
+    Modified TPCRP:
+    combine typicality + centrality score
+    """
+
+    selected_indices = []
+
+    unique_clusters = np.unique(cluster_labels)
+
+    for cluster_id in unique_clusters:
+
+        cluster_indices = np.where(cluster_labels == cluster_id)[0]
+
+        if len(cluster_indices) == 0:
+            continue
+
+        cluster_features = features[cluster_indices]
+
+        typicality = compute_typicality_of_points(cluster_features)
+
+        centrality = compute_centrality(cluster_features)
+
+        # normalize scores
+        typicality = (typicality - typicality.min()) / (typicality.max() - typicality.min() + 1e-8)
+        centrality = (centrality - centrality.min()) / (centrality.max() - centrality.min() + 1e-8)
+
+        score = alpha * typicality + (1 - alpha) * centrality
+
+        best_index_local = np.argmax(score)
+
+        best_index_global = cluster_indices[best_index_local]
+
+        selected_indices.append(best_index_global)
+
+    return selected_indices[:budget]
