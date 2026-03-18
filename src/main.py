@@ -1,20 +1,21 @@
 import os
 import numpy as np
 from torch.utils.data import Subset
-
-from test_loader import get_cifar10_test_loader
 from clustering import cluster_features
-from selector import select_most_typical_per_cluster, select_weighted_typical_samples, select_centrality_typical_samples
-from random_selector import select_random_samples
-from train_classifier import create_selected_subset, train_model
-
+from plot_results import plot_bar,plot_runs
 from simclr.train_simclr import train_simclr
+from test_loader import get_cifar10_test_loader
+from random_selector import select_random_samples
 from simclr.extract_embeddings import extract_embeddings
+from train_classifier import create_selected_subset, train_model
+from selector import select_most_typical_per_cluster, select_weighted_typical_samples, select_centrality_typical_samples
+
 
 SUBSET_SIZE = 50000
 BUDGET = 200
 EPOCHS = 30
 SIMCLR_EPOCHS = 30
+NUM_RUNS = 10 #5
 
 MODEL_PATH = "models/simclr_resnet18.pth"
 
@@ -45,7 +46,6 @@ def run_tpcrp(dataset, features, test_loader):
     return selected_indices, test_acc
 
 
-
 def run_random_baseline(dataset, test_loader):
     print("\n--- Running Random Baseline ---")
 
@@ -62,7 +62,6 @@ def run_random_baseline(dataset, test_loader):
     _, test_acc = train_model(train_subset, test_loader, EPOCHS, batch_size=16)
 
     return selected_indices, test_acc
-
 
 
 def run_weighted_tpcrp(dataset, features, test_loader):
@@ -89,7 +88,6 @@ def run_weighted_tpcrp(dataset, features, test_loader):
     _, test_acc = train_model(train_subset, test_loader, EPOCHS, batch_size=16)
 
     return selected_indices, test_acc
-
 
 
 def run_centrality_tpcrp(dataset, features, test_loader):
@@ -119,8 +117,12 @@ def run_centrality_tpcrp(dataset, features, test_loader):
     return selected_indices, test_acc
 
 
-
 def main():
+
+    tpcrp_results = [] # original tpcrp
+    centrality_results = [] # modified verson
+    random_results = [] #random
+
     print("Loading CIFAR-10 test set...")
     _, test_loader = get_cifar10_test_loader()
 
@@ -148,28 +150,54 @@ def main():
 
     print(f"Embedding shape: {features.shape}")
 
-    # Run TPCRP
-    tpcrp_indices, tpcrp_acc = run_tpcrp(dataset, features, test_loader)
+    for run in range(NUM_RUNS):
 
-    # Run modified TPCRP (centrality-weighted-typicality)
-    centrality_indices, centrality_acc = run_centrality_tpcrp(dataset, features, test_loader)
+        print(f"\n===== RUN {run+1} =====")
 
-    # Run Random baseline
-    random_indices, random_acc = run_random_baseline(dataset, test_loader)
+        # Run TPCRP
+        tpcrp_indices, tpcrp_acc = run_tpcrp(dataset, features, test_loader)
 
+        # Run modified TPCRP (centrality-weighted-typicality)
+        centrality_indices, centrality_acc = run_centrality_tpcrp(dataset, features, test_loader)
+
+        # Run Random baseline
+        random_indices, random_acc = run_random_baseline(dataset, test_loader)
+
+        # store results
+        tpcrp_results.append(tpcrp_acc)
+        centrality_results.append(centrality_acc)
+        random_results.append(random_acc)
+
+    # save final selections (last run)
     np.save("results/tpcrp_indices.npy", np.array(tpcrp_indices)) # Normal TPCRP
     np.save("results/weighted_tpcrp_indices.npy", np.array(centrality_indices)) # Modified TPCRP
     np.save("results/random_indices.npy", np.array(random_indices)) # Random baseline
 
+    # compute stats
+    tpcrp_mean, tpcrp_std = np.mean(tpcrp_results), np.std(tpcrp_results)
+    centrality_mean, centrality_std = np.mean(centrality_results), np.std(centrality_results)
+    random_mean, random_std = np.mean(random_results), np.std(random_results)
+
     print("\n--- Final Comparison ---")
-    print(f"TPCRP Test Accuracy:           {tpcrp_acc:.2f}%")
-    print(f"Centrality TPCRP Accuracy (Modified implementation):     {centrality_acc:.2f}%")
-    print(f"Random Test Accuracy:          {random_acc:.2f}%")
+    print(f"TPCRP Runs: {tpcrp_results}")
+    print(f"Centrality Runs: {centrality_results}")
+    print(f"Random Runs: {random_results}")
+
+    print("\n--- Mean ± Std ---")
+    print(f"TPCRP: {tpcrp_mean:.2f} ± {tpcrp_std:.2f}")
+    print(f"Centrality TPCRP: {centrality_mean:.2f} ± {centrality_std:.2f}")
+    print(f"Random: {random_mean:.2f} ± {random_std:.2f}")
+
     print(
-        f"Budget: {BUDGET} | Subset size: {SUBSET_SIZE} | "
+        f"\nBudget: {BUDGET} | Subset size: {SUBSET_SIZE} | "
         f"Epochs: {EPOCHS} | SimCLR epochs: {SIMCLR_EPOCHS}"
     )
 
+    # plot metrics 
+    plot_bar(tpcrp_results, centrality_results, random_results)
+    plot_runs(tpcrp_results, centrality_results, random_results)
+    print("\nSaved plots to results/bar_plot.png and results/line_plot.png")
+
 
 if __name__ == "__main__":
-        main()
+    main()
