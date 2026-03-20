@@ -1,18 +1,18 @@
-# virtual environments
-venv
-.venv
+# Virtual Environments
 venv/
 .venv/
 
-#commands
+# Python Cache
+__pycache__/
+src/__pycache__/
+
+# Project Files
 commands.txt
 experiments/terminal_work.py
 
-#misc 
-src/__pycache__/
-__pycache__/
-__pycache__
+# Data & Results
 data/
-.DS_Store
 results/
-models/
+
+# OS Files
+.DS_Store
