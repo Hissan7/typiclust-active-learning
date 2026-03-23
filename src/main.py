@@ -124,6 +124,7 @@ def main():
     random_results = [] #random
 
     print("Loading CIFAR-10 test set...")
+    print("Note : This program will execute the 3 models over 10 runs each and may take quite a while to finish")
     _, test_loader = get_cifar10_test_loader()
 
     os.makedirs("results", exist_ok=True)
