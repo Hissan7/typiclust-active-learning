@@ -20,6 +20,48 @@ The project also compares:
 
 ---
 
+
+## Installation and Setup
+
+Here are instructions on setting up and running the pipeline.
+
+## Running normally (Option 1) 
+
+After cloning the repository : 
+
+### 1. Create a virtual environment 
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Install all dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the main script 
+
+```bash
+python src/main.py
+```
+
+## Running through the notebook (Option 2)
+
+### 1. Install all dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Run the notebook 
+
+Go to `notebooks/cw2_code_appendix.ipynb` and run all cells
+
+(**Note :** Please ensure you are using the right venv and interpreter. It is recommended to run the program the normal way (Option 1))
+
 ## What the Program Does
 
 The pipeline follows these steps:
@@ -67,26 +109,6 @@ This project reproduces the **core TPCRP idea**:
 
 It follows the structure described in the paper:
 - Representation learning → clustering → typicality → selection  
-
----
-
-## Repository Structure
-
-src/
-main.py
-clustering.py
-selector.py
-random_selector.py
-train_classifier.py
-test_loader.py
-simclr/
-train_simclr.py
-extract_embeddings.py
-
-results/
-models/
-notebooks/
-report/
 
 ---
 
@@ -142,28 +164,3 @@ results/line_plot.png
 - matplotlib  
 
 ---
-
-## Installation and Setup
-
-After cloning the repository : 
-
-### 1. Create a virtual environment 
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-### 2. Install all dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the main script 
-
-```bash
-python src/main.py
-```
-
-
